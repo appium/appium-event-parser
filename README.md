@@ -9,6 +9,10 @@ This is a simple CLI script to parse Appium event timings. What are event timing
 npm install -g appium-event-parser
 ```
 
+## Requirements
+
+* NodeJS v7+
+
 ## Usage
 
 First of all you need to have the output from `GET /session/:id` stored in a `.json` file somewhere. The best time to call `GET /session/:id` is right before calling `driver.quit()` so that you know you've received all the events you might care about.
