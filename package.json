@@ -1,0 +1,38 @@
+{
+  "name": "appium-event-parser",
+  "description": "Event Timing Parser",
+  "tags": [],
+  "version": "1.0.0-beta",
+  "author": "https://github.com/appium",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/appium/appium.git"
+  },
+  "bugs": {
+    "url": "https://github.com/appium/appium/issues"
+  },
+  "engines": {
+    "node": ">=7",
+    "npm": ">=4"
+  },
+  "main": "./index.js",
+  "bin": {
+      "appium-event-parser": "./index.js"
+  },
+  "directories": {
+    "lib": ".",
+    "doc": "./docs"
+  },
+  "dependencies": {
+    "asyncbox": "^2.3.1",
+    "bluebird": "^3.5.0",
+    "lodash": "^4.17.4",
+    "minimist": "^1.2.0",
+    "stats-lite": "^2.0.4"
+  },
+  "scripts": {},
+  "pre-commit": [],
+  "devDependencies": {},
+  "optionalDependencies": {}
+}
