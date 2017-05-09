@@ -2,7 +2,7 @@
   "name": "appium-event-parser",
   "description": "Event Timing Parser",
   "tags": [],
-  "version": "1.0.0-beta",
+  "version": "1.0.0",
   "author": "https://github.com/appium",
   "license": "Apache-2.0",
   "repository": {
@@ -18,7 +18,7 @@
   },
   "main": "./index.js",
   "bin": {
-      "appium-event-parser": "./index.js"
+    "appium-event-parser": "./index.js"
   },
   "directories": {
     "lib": ".",
