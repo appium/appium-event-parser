@@ -13,7 +13,7 @@ function timeline (data) {
   //   ["eventName", timestamp2],
   //   ["eventName2", timestamp3]
   // ]
-  for (let eventType of Object.keys(data).filter(k => k !== 'commands')) {
+  for (let eventType of Object.keys(data).filter(k => k !== 'commands' && data[k].iterate !== false)) {
     for (let eventTime of data[eventType]) {
       absTimeline.push([eventType, eventTime]);
     }
