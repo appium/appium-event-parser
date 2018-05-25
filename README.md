@@ -1,6 +1,8 @@
 appium-event-parser
 ===========
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/appium/appium-event-parser.svg)](https://greenkeeper.io/)
+
 This is a simple CLI script to parse Appium event timings. What are event timings? When you pass the capability `eventTimings` with the value `true` to an Appium session, then when calling the get session capabilities command in your client (`GET /session/:id`) you will have an `events` key in the response object. This key contains information about Appium-internal events and when they occurred. This information is useful for profiling Appium or debugging Appium, and is not generally useful for users.
 
 Any custom data added to the event timing JSON (for instance, to identify a build) can be marked with a property `iterate` set to `false`.
