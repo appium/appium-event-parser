@@ -42,7 +42,7 @@ function timeline (data) {
 function printTimeline (timeline, lines = 200) {
   const msPerLine = timeline[timeline.length - 1][1] / lines;
   let slices = [];
-  for (let i = 0; i <= lines; i++) {
+  for (let i = 0; i <= lines + 1; i++) {
     slices[i] = [];
   }
   for (let evtTuple of timeline) {
