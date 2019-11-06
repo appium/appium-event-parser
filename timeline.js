@@ -51,6 +51,11 @@ function printTimeline (timeline, lines = 200) {
     slices[slice].push([evt, time]);
   }
 
+  // make sure we don't end up with an empty slice at the end
+  if (slices[slices.length - 1].length === 0) {
+    slices.pop();
+  }
+
   // find gaps
   let gaps = [];
   for (let i = 0, j = 1; i < slices.length - 1, j < slices.length; i++, j++) {

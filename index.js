@@ -25,12 +25,13 @@ function main () {
   } else {
     data.push(require(input));
   }
+  const lines = parseInt(argv.l || "50", 10);
   if (argv.t) {
     if (data.length > 1) {
       throw new Error("timeline can only have one json file");
     }
     let t = timeline(data[0].events || data[0]);
-    printTimeline(t, 50);
+    printTimeline(t, lines);
     return;
   }
   if (argv.s) {

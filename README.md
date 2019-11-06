@@ -83,6 +83,8 @@ Which will show something like:
 [wdaSessionStarted@123.705s, wdaPermsAdjusted@123.746s, wdaStarted@123.747s, orientationSet@124.146s]
 ```
 
+You can adjust the number of lines taken up by the timeline with the `-l` parameter (e.g., `-l 50` is the default of 50 lines).
+
 ### Comparison statistics
 
 If you have a directory with lots of session capabilities `.json` files, you can get stastical information about certain events we care about in the XCUITest driver:
