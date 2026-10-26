@@ -3,11 +3,17 @@ const { timeline } = require('./timeline');
 const { mean, stdev } = require('stats-lite');
 
 function evtTime(timeline, evt) {
-  return timeline.filter(e => e[0] === evt)[0][1];
+  let match = timeline.find(e => e[0] === evt);
+  return match ? match[1] : null;
 }
 
 function evtTimeBetween(timeline, evt1, evt2) {
-  return evtTime(timeline, evt2) - evtTime(timeline, evt1);
+  let t1 = evtTime(timeline, evt1);
+  let t2 = evtTime(timeline, evt2);
+  if (t1 === null || t2 === null) {
+    return null;
+  }
+  return t2 - t1;
 }
 
 function xcuitestStat (timeline, commands) {
@@ -19,9 +25,18 @@ function xcuitestStat (timeline, commands) {
     numWdaSessionAttempts: 0,
   };
 
-  stats.simStartLength = evtTimeBetween(timeline, "xcodeDetailsRetrieved", "simStarted") / 1000;
-  stats.wdaStartLength = evtTimeBetween(timeline, "simStarted", "wdaSessionAttempted") / 1000;
-  stats.wdaSessionStartLength = evtTimeBetween(timeline, "wdaSessionAttempted", "wdaSessionStarted") / 1000;
+  let simStartMs = evtTimeBetween(timeline, "xcodeDetailsRetrieved", "simStarted");
+  stats.simStartLength = simStartMs !== null ? simStartMs / 1000 : null;
+
+  let wdaStartAnchor = evtTime(timeline, "simStarted") !== null
+    ? "simStarted"
+    : ["wdaStartAttempted", "appInstalled", "resetComplete", "xcodeDetailsRetrieved"]
+        .find(evt => evtTime(timeline, evt) !== null);
+  let wdaStartMs = wdaStartAnchor ? evtTimeBetween(timeline, wdaStartAnchor, "wdaSessionAttempted") : null;
+  stats.wdaStartLength = wdaStartMs !== null ? wdaStartMs / 1000 : null;
+
+  let wdaSessionStartMs = evtTimeBetween(timeline, "wdaSessionAttempted", "wdaSessionStarted");
+  stats.wdaSessionStartLength = wdaSessionStartMs !== null ? wdaSessionStartMs / 1000 : null;
   stats.numWdaStartAttempts = timeline.filter(e => e[0] === "wdaStartAttempted").length;
   stats.numWdaSessionAttempts = timeline.filter(e => e[0] === "wdaSessionAttempted").length;
 
@@ -43,9 +58,9 @@ function xcuitestStats (dataSets) {
   let avgs = {};
   let stdevs = {};
   for (let key of keys) {
-    let vals = allStats.map(s => s[key]);
-    avgs[key] = mean(vals);
-    stdevs[key] = stdev(vals);
+    let vals = allStats.map(s => s[key]).filter(v => typeof v === "number" && !Number.isNaN(v));
+    avgs[key] = vals.length ? mean(vals) : null;
+    stdevs[key] = vals.length ? stdev(vals) : null;
   }
   return [allStats, avgs, stdevs];
 }

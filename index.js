@@ -23,7 +23,7 @@ function main () {
       }
     }
   } else {
-    data.push(require(input));
+    data.push(require(path.resolve(input)));
   }
   const lines = parseInt(argv.l || "50", 10);
   if (argv.t) {

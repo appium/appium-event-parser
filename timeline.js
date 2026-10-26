@@ -40,6 +40,9 @@ function timeline (data) {
 }
 
 function printTimeline (timeline, lines = 200) {
+  if (!timeline.length) {
+    return;
+  }
   const msPerLine = timeline[timeline.length - 1][1] / lines;
   let slices = [];
   for (let i = 0; i <= lines + 1; i++) {
@@ -47,12 +50,12 @@ function printTimeline (timeline, lines = 200) {
   }
   for (let evtTuple of timeline) {
     let [evt, time] = evtTuple;
-    let slice = Math.ceil(time / msPerLine);
+    let slice = msPerLine > 0 ? Math.ceil(time / msPerLine) : 0;
     slices[slice].push([evt, time]);
   }
 
   // make sure we don't end up with an empty slice at the end
-  if (slices[slices.length - 1].length === 0) {
+  while (slices.length > 1 && slices[slices.length - 1].length === 0) {
     slices.pop();
   }
 
