@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
 import {execFile} from 'node:child_process';
+import {mkdtemp, rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
 import {describe, it} from 'node:test';
 import {fileURLToPath} from 'node:url';
 import {promisify} from 'node:util';
@@ -46,6 +49,15 @@ describe('cli', function () {
   it('should accept JSON files with a leading BOM', async function () {
     const {stdout} = await run(process.execPath, [CLI, '-t', '-i', BOM]);
     assert.match(stdout, /xcodeDetailsRetrieved@0s/);
+  });
+
+  it('should fail for a directory without JSON files', async function () {
+    const dir = await mkdtemp(path.join(tmpdir(), 'event-parser-'));
+    try {
+      await assert.rejects(run(process.execPath, [CLI, '-t', '-i', dir]), /No \.json files found/);
+    } finally {
+      await rm(dir, {recursive: true, force: true});
+    }
   });
 
   it('should print stats', async function () {

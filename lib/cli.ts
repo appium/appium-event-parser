@@ -38,6 +38,9 @@ async function run({input, lines, timeline: showTimeline, stats: showStats}: Cli
   } else {
     data.push(await readJson(path.resolve(input)));
   }
+  if (!data.length) {
+    throw new Error(`No .json files found in ${input}`);
+  }
   if (showTimeline) {
     if (data.length > 1) {
       throw new Error('timeline can only have one json file');
