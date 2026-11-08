@@ -1,0 +1,44 @@
+name: Node.js CI
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths-ignore:
+    - 'docs/**'
+    - '*.md'
+  push:
+    branches: [ master ]
+    paths-ignore:
+    - 'docs/**'
+    - '*.md'
+
+jobs:
+  node_matrix:
+    uses: appium/appium-workflows/.github/workflows/node-lts-matrix.yml@main
+
+  test:
+    env:
+      CI: 'true'
+    needs:
+    - node_matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ${{ fromJSON(needs.node_matrix.outputs.versions) }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v7
+      with:
+        node-version: ${{ matrix.node-version }}
+    - uses: SocketDev/action@v1
+      with:
+        mode: firewall-free
+    - run: sfw npm install --no-package-lock
+      name: Install dev dependencies
+    - run: npm run lint
+      name: Run linter
+    - run: npm run format:check
+      name: Run format check
+    - run: npm run test
+      name: Run tests
