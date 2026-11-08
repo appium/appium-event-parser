@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {execFile} from 'node:child_process';
-import {mkdtemp, rm} from 'node:fs/promises';
+import {mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {describe, it} from 'node:test';
@@ -55,6 +55,23 @@ describe('cli', function () {
     const dir = await mkdtemp(path.join(tmpdir(), 'event-parser-'));
     try {
       await assert.rejects(run(process.execPath, [CLI, '-t', '-i', dir]), /No \.json files found/);
+    } finally {
+      await rm(dir, {recursive: true, force: true});
+    }
+  });
+
+  it('should include dot-prefixed JSON files from a directory', async function () {
+    const dir = await mkdtemp(path.join(tmpdir(), 'event-parser-'));
+    try {
+      const events = JSON.parse(await readFile(FIXTURE, 'utf8'));
+      // simStartLength is 2s and 4s
+      await writeFile(path.join(dir, 'visible.json'), JSON.stringify(events));
+      await writeFile(
+        path.join(dir, '.session.json'),
+        JSON.stringify({events: {...events.events, simStarted: [5000]}}),
+      );
+      const {stdout} = await run(process.execPath, [CLI, '-s', '-i', dir]);
+      assert.match(stdout, /simStartLength: 3/);
     } finally {
       await rm(dir, {recursive: true, force: true});
     }

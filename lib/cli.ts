@@ -11,6 +11,8 @@ import {computeXcuitestStats} from './stats.js';
 import {Timeline, type EventData} from './timeline.js';
 
 const READ_CONCURRENCY = 10;
+// globs skip dot-prefixed names unless the pattern starts with a dot
+const JSON_GLOBS = ['*.json', '.*.json', '.json'];
 
 interface CliOptions {
   input: string;
@@ -28,7 +30,7 @@ async function run({input, lines, timeline: showTimeline, stats: showStats}: Cli
   const data: EventData[] = [];
   if ((await lstat(input)).isDirectory()) {
     const files: string[] = [];
-    for await (const file of glob('*.json', {cwd: input})) {
+    for await (const file of glob(JSON_GLOBS, {cwd: input})) {
       files.push(file);
     }
     // asyncmap keeps the input order
