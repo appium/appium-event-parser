@@ -1,0 +1,11 @@
+﻿{
+  "events": {
+    "xcodeDetailsRetrieved": [1000],
+    "simStarted": [3000],
+    "wdaStartAttempted": [3500, 6000],
+    "wdaSessionAttempted": [8000],
+    "wdaSessionStarted": [9500],
+    "buildId": {"iterate": false},
+    "commands": []
+  }
+}

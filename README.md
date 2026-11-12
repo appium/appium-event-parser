@@ -13,7 +13,7 @@ npm install -g appium-event-parser
 
 ## Requirements
 
-* NodeJS v7+
+* NodeJS `^22.22.2 || ^24.15.0 || >=26.0.0`
 
 ## Usage
 

@@ -1,37 +1,57 @@
 {
   "name": "appium-event-parser",
-  "description": "Event Timing Parser",
-  "tags": [],
   "version": "1.2.0",
-  "author": "https://github.com/appium",
+  "description": "Event Timing Parser",
+  "keywords": [
+    "appium",
+    "event timings",
+    "profiling"
+  ],
+  "bugs": {
+    "url": "https://github.com/appium/appium-event-parser/issues"
+  },
   "license": "Apache-2.0",
+  "author": "Appium Contributors",
   "repository": {
     "type": "git",
-    "url": "https://github.com/appium/appium.git"
+    "url": "https://github.com/appium/appium-event-parser.git"
   },
-  "bugs": {
-    "url": "https://github.com/appium/appium/issues"
-  },
-  "engines": {
-    "node": ">=7",
-    "npm": ">=4"
-  },
-  "main": "./index.js",
   "bin": {
-    "appium-event-parser": "./index.js"
+    "appium-event-parser": "./build/lib/cli.js"
   },
   "directories": {
-    "lib": ".",
-    "doc": "./docs"
+    "lib": "./lib"
+  },
+  "files": [
+    "lib",
+    "build/lib",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "npm run build -- --clean",
+    "rebuild": "npm run clean && npm run build",
+    "dev": "npm run build -- --watch",
+    "lint": "oxlint -c oxlint.config.mjs .",
+    "lint:fix": "oxlint -c oxlint.config.mjs --fix .",
+    "format": "oxfmt -c oxfmt.config.mjs .",
+    "format:check": "oxfmt -c oxfmt.config.mjs --check .",
+    "prepare": "npm run build",
+    "test": "node --enable-source-maps --test --test-timeout=60000 \"./build/test/**/*.spec.js\""
   },
   "dependencies": {
-    "bluebird": "^3.5.0",
-    "lodash": "^4.17.4",
-    "minimist": "^1.2.0",
-    "stats-lite": "^2.0.4"
+    "asyncbox": "^6.6.0",
+    "commander": "^15.0.0"
   },
-  "scripts": {},
-  "pre-commit": [],
-  "devDependencies": {},
-  "optionalDependencies": {}
+  "devDependencies": {
+    "@appium/oxc-config": "^2.0.0-beta.2",
+    "@appium/semantic-release-config": "^2.0.0-beta.1",
+    "@appium/tsconfig": "^2.0.0-beta.1",
+    "@types/node": "^26.0.0"
+  },
+  "engines": {
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0",
+    "npm": ">=10"
+  }
 }
