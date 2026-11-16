@@ -10,20 +10,39 @@ export type XcuitestStat = {
 
 const MILLIS_PER_SECOND = 1000;
 
+export type XcuitestStatSummary = {
+  [K in keyof XcuitestStat]: null extends XcuitestStat[K] ? number | null : number;
+};
+
+const NULLABLE_STAT_KEYS = ['simStartLength', 'wdaStartLength', 'wdaSessionStartLength'] as const;
+const COUNT_STAT_KEYS = ['numWdaStartAttempts', 'numWdaSessionAttempts'] as const;
+
 /** Computes per-dataset XCUITest stats along with their averages and standard deviations. */
 export function computeXcuitestStats(
   dataSets: EventData[],
-): [allStats: XcuitestStat[], avgs: Record<string, number | null>, stdevs: Record<string, number | null>] {
+): [allStats: XcuitestStat[], avgs: XcuitestStatSummary, stdevs: XcuitestStatSummary] {
   // each set may be a full session capabilities object with an events key, or just the event data
   const allStats = dataSets.map((set) => XcuitestTimeline.fromData(set.events || set).stats());
-  const avgs: Record<string, number | null> = {};
-  const stdevs: Record<string, number | null> = {};
-  for (const key of Object.keys(allStats[0] ?? {}) as (keyof XcuitestStat)[]) {
-    const vals = allStats.map((s) => s[key]).filter((v): v is number => typeof v === 'number' && !Number.isNaN(v));
-    avgs[key] = vals.length ? mean(vals) : null;
-    stdevs[key] = vals.length ? stdev(vals) : null;
-  }
-  return [allStats, avgs, stdevs];
+  const summarize = (aggregate: (vals: number[]) => number): XcuitestStatSummary => {
+    const pick = (key: keyof XcuitestStat) =>
+      allStats.map((s) => s[key]).filter((v): v is number => typeof v === 'number' && !Number.isNaN(v));
+    const [simStartLength, wdaStartLength, wdaSessionStartLength] = NULLABLE_STAT_KEYS.map((key) => {
+      const vals = pick(key);
+      return vals.length ? aggregate(vals) : null;
+    });
+    const [numWdaStartAttempts, numWdaSessionAttempts] = COUNT_STAT_KEYS.map((key) => {
+      const vals = pick(key);
+      return vals.length ? aggregate(vals) : 0;
+    });
+    return {
+      simStartLength,
+      wdaStartLength,
+      wdaSessionStartLength,
+      numWdaStartAttempts,
+      numWdaSessionAttempts,
+    };
+  };
+  return [allStats, summarize(mean), summarize(stdev)];
 }
 
 /** Computes XCUITest stats for a single timeline. */

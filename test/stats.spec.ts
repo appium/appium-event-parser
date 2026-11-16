@@ -16,6 +16,10 @@ describe('computeXcuitestStats', function () {
       numWdaStartAttempts: 2,
       numWdaSessionAttempts: 1,
     };
+    const avgAttempts: number = avgs.numWdaStartAttempts;
+    const stdevAttempts: number = stdevs.numWdaSessionAttempts;
+    assert.equal(avgAttempts, 2);
+    assert.equal(stdevAttempts, 0);
     assert.deepEqual(all, [expected, expected]);
     assert.deepEqual(avgs, expected);
     assert.deepEqual(stdevs, Object.fromEntries(Object.keys(expected).map((k) => [k, 0])));
