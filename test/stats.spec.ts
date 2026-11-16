@@ -28,4 +28,45 @@ describe('computeXcuitestStats', function () {
     assert.equal(avgs.simStartLength, 3);
     assert.equal(stdevs.simStartLength, 1);
   });
+
+  it('should handle real-device timelines without simStarted', function () {
+    const realDevice = {
+      events: {
+        xcodeDetailsRetrieved: [1000],
+        appInstalled: [3000],
+        wdaStartAttempted: [5000],
+        wdaSessionAttempted: [8000],
+        wdaSessionStarted: [10500],
+      },
+    };
+    const [all, avgs, stdevs] = computeXcuitestStats([realDevice]);
+    assert.deepEqual(all, [
+      {
+        simStartLength: null,
+        wdaStartLength: 3,
+        wdaSessionStartLength: 2.5,
+        numWdaStartAttempts: 1,
+        numWdaSessionAttempts: 1,
+      },
+    ]);
+    assert.equal(avgs.simStartLength, null);
+    assert.equal(stdevs.simStartLength, null);
+    assert.equal(avgs.wdaStartLength, 3);
+    assert.equal(avgs.wdaSessionStartLength, 2.5);
+  });
+
+  it('should ignore null stats when aggregating mixed runs', function () {
+    const realDevice = {
+      events: {
+        xcodeDetailsRetrieved: [1000],
+        wdaSessionAttempted: [3000],
+        wdaSessionStarted: [4500],
+      },
+    };
+    const [, avgs, stdevs] = computeXcuitestStats([fixture, realDevice]);
+    assert.equal(avgs.simStartLength, 2);
+    assert.equal(stdevs.simStartLength, 0);
+    assert.equal(avgs.wdaStartLength, 3.5);
+    assert.equal(avgs.wdaSessionStartLength, 1.5);
+  });
 });
