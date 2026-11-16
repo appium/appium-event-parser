@@ -65,8 +65,8 @@ export class Timeline {
       slices[msPerLine ? Math.ceil(time / msPerLine) : 0].push([evt, time]);
     }
 
-    // make sure we don't end up with an empty slice at the end
-    if (!slices[slices.length - 1].length) {
+    // make sure we don't end up with empty slices at the end
+    while (slices.length > 1 && !slices[slices.length - 1].length) {
       slices.pop();
     }
     return slices;

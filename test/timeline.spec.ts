@@ -37,8 +37,8 @@ describe('Timeline#render', function () {
     assert.deepEqual(new Timeline([]).render(), []);
   });
 
-  it('should not fail on a single-event timeline', function () {
+  it('should not fail or emit trailing empty slices on a single-event timeline', function () {
     const lines = new Timeline([['a', 0]]).render(10);
-    assert.ok(lines[0].includes('a@0s'));
+    assert.deepEqual(lines, ['[a@0s]']);
   });
 });
