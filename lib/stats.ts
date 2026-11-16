@@ -8,12 +8,7 @@ export type XcuitestStat = {
   numWdaSessionAttempts: number;
 };
 
-const WDA_START_FALLBACK_EVENTS = [
-  'wdaStartAttempted',
-  'appInstalled',
-  'resetComplete',
-  'xcodeDetailsRetrieved',
-] as const;
+const MILLIS_PER_SECOND = 1000;
 
 /** Computes per-dataset XCUITest stats along with their averages and standard deviations. */
 export function computeXcuitestStats(
@@ -35,17 +30,13 @@ export function computeXcuitestStats(
 class XcuitestTimeline extends Timeline {
   stats(): XcuitestStat {
     const simStartMs = this.evtTimeBetween('xcodeDetailsRetrieved', 'simStarted');
-    const wdaStartAnchor =
-      this.evtTime('simStarted') !== null
-        ? 'simStarted'
-        : WDA_START_FALLBACK_EVENTS.find((evt) => this.evtTime(evt) !== null);
-    const wdaStartMs = wdaStartAnchor ? this.evtTimeBetween(wdaStartAnchor, 'wdaSessionAttempted') : null;
+    const wdaStartMs = this.evtTimeBetween('simStarted', 'wdaSessionAttempted');
     const wdaSessionStartMs = this.evtTimeBetween('wdaSessionAttempted', 'wdaSessionStarted');
 
     return {
-      simStartLength: simStartMs !== null ? simStartMs / 1000 : null,
-      wdaStartLength: wdaStartMs !== null ? wdaStartMs / 1000 : null,
-      wdaSessionStartLength: wdaSessionStartMs !== null ? wdaSessionStartMs / 1000 : null,
+      simStartLength: simStartMs !== null ? simStartMs / MILLIS_PER_SECOND : null,
+      wdaStartLength: wdaStartMs !== null ? wdaStartMs / MILLIS_PER_SECOND : null,
+      wdaSessionStartLength: wdaSessionStartMs !== null ? wdaSessionStartMs / MILLIS_PER_SECOND : null,
       numWdaStartAttempts: this.count('wdaStartAttempted'),
       numWdaSessionAttempts: this.count('wdaSessionAttempted'),
     };

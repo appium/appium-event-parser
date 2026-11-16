@@ -43,7 +43,7 @@ describe('computeXcuitestStats', function () {
     assert.deepEqual(all, [
       {
         simStartLength: null,
-        wdaStartLength: 3,
+        wdaStartLength: null,
         wdaSessionStartLength: 2.5,
         numWdaStartAttempts: 1,
         numWdaSessionAttempts: 1,
@@ -51,8 +51,62 @@ describe('computeXcuitestStats', function () {
     ]);
     assert.equal(avgs.simStartLength, null);
     assert.equal(stdevs.simStartLength, null);
-    assert.equal(avgs.wdaStartLength, 3);
+    assert.equal(avgs.wdaStartLength, null);
+    assert.equal(stdevs.wdaStartLength, null);
     assert.equal(avgs.wdaSessionStartLength, 2.5);
+  });
+
+  it('should return null lengths when no anchor events exist', function () {
+    const [all, avgs, stdevs] = computeXcuitestStats([{events: {}}]);
+    assert.deepEqual(all, [
+      {
+        simStartLength: null,
+        wdaStartLength: null,
+        wdaSessionStartLength: null,
+        numWdaStartAttempts: 0,
+        numWdaSessionAttempts: 0,
+      },
+    ]);
+    assert.deepEqual(avgs, {
+      simStartLength: null,
+      wdaStartLength: null,
+      wdaSessionStartLength: null,
+      numWdaStartAttempts: 0,
+      numWdaSessionAttempts: 0,
+    });
+    assert.deepEqual(stdevs, {
+      simStartLength: null,
+      wdaStartLength: null,
+      wdaSessionStartLength: null,
+      numWdaStartAttempts: 0,
+      numWdaSessionAttempts: 0,
+    });
+  });
+
+  it('should return null wda lengths when wdaSessionAttempted is absent', function () {
+    const partial = {
+      events: {
+        xcodeDetailsRetrieved: [1000],
+        simStarted: [3000],
+        wdaStartAttempted: [4000],
+      },
+    };
+    const [all, avgs, stdevs] = computeXcuitestStats([partial]);
+    assert.deepEqual(all, [
+      {
+        simStartLength: 2,
+        wdaStartLength: null,
+        wdaSessionStartLength: null,
+        numWdaStartAttempts: 1,
+        numWdaSessionAttempts: 0,
+      },
+    ]);
+    assert.equal(avgs.simStartLength, 2);
+    assert.equal(stdevs.simStartLength, 0);
+    assert.equal(avgs.wdaStartLength, null);
+    assert.equal(stdevs.wdaStartLength, null);
+    assert.equal(avgs.wdaSessionStartLength, null);
+    assert.equal(stdevs.wdaSessionStartLength, null);
   });
 
   it('should ignore null stats when aggregating mixed runs', function () {
@@ -66,7 +120,8 @@ describe('computeXcuitestStats', function () {
     const [, avgs, stdevs] = computeXcuitestStats([fixture, realDevice]);
     assert.equal(avgs.simStartLength, 2);
     assert.equal(stdevs.simStartLength, 0);
-    assert.equal(avgs.wdaStartLength, 3.5);
+    assert.equal(avgs.wdaStartLength, 5);
+    assert.equal(stdevs.wdaStartLength, 0);
     assert.equal(avgs.wdaSessionStartLength, 1.5);
   });
 });

@@ -110,4 +110,6 @@ And you'll get something like:
      numWdaSessionAttempts: 0 } }
 ```
 
+Note: Metrics whose required events are absent (such as `simStartLength` and `wdaStartLength` on real-device sessions without `simStarted`) evaluate to `null` for that session and are excluded when computing `avgs` and `stdevs`. As a result, sample sizes can differ per metric in mixed simulator and real-device runs (and a metric with no non-null values yields `null`).
+
 That's about it!
