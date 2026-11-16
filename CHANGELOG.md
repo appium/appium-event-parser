@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/appium/appium-event-parser/compare/v2.0.0...v2.0.1) (2026-11-16)
+
+### Bug Fixes
+
+* support real-device XCUITest event timings and single-timestamp timelines ([#7](https://github.com/appium/appium-event-parser/issues/7)) ([e20d55d](https://github.com/appium/appium-event-parser/commit/e20d55db4e233e60398066e8dc62a7d3782fa383))
+
 ## [2.0.0](https://github.com/appium/appium-event-parser/compare/v1.2.0...v2.0.0) (2026-11-12)
 
 ### ⚠ BREAKING CHANGES
