@@ -42,8 +42,8 @@ describe('cli', function () {
   });
 
   it('should honor --lines', async function () {
-    const {stdout} = await run(process.execPath, [CLI, '-t', '-i', FIXTURE, '--lines', '5']);
-    assert.ok(stdout.trim().split('\n').length <= 7);
+    const {stdout} = await run(process.execPath, [CLI, '-t', '-i', FIXTURE, '--lines', '2']);
+    assert.equal(stdout.trim().split('\n').length, 3);
   });
 
   it('should print usage for --help', async function () {
