@@ -41,7 +41,7 @@
     "test": "node --enable-source-maps --test --test-timeout=60000 \"./build/test/**/*.spec.js\""
   },
   "dependencies": {
-    "asyncbox": "^6.6.0"
+    "asyncbox": "^7.1.0"
   },
   "devDependencies": {
     "@appium/oxc-config": "^2.0.0-beta.2",
