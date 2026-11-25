@@ -2,10 +2,9 @@
 
 import {glob, lstat, readFile} from 'node:fs/promises';
 import path from 'node:path';
-import {inspect} from 'node:util';
+import {inspect, parseArgs} from 'node:util';
 
 import {asyncmap} from 'asyncbox';
-import {Command} from 'commander';
 
 import {computeXcuitestStats} from './stats.js';
 import {Timeline, type EventData} from './timeline.js';
@@ -58,21 +57,58 @@ async function run({input, lines, timeline: showTimeline, stats: showStats}: Cli
   throw new Error('Use -t to print a timeline or -s to print stats');
 }
 
-const program = new Command()
-  .name('appium-event-parser')
-  .description('Parse Appium event timings')
-  .requiredOption('-i, --input <path>', 'path to an input .json file or a directory of them')
-  .option('-l, --lines <number>', 'number of timeline lines', (v) => parseInt(v, 10), 50)
-  .option('-t, --timeline', 'print a timeline of the events')
-  .option('-s, --stats', 'print XCUITest stats')
-  // ignore unknown flags, as minimist did
-  .allowUnknownOption()
-  .allowExcessArguments()
-  .action(run);
+const USAGE = `Usage: appium-event-parser -i <path> (-t | -s) [-l <number>]
+
+Parse Appium event timings
+
+Options:
+  -i, --input <path>    path to an input .json file or a directory of them (required)
+  -l, --lines <number>  number of timeline lines (default: 50)
+  -t, --timeline        print a timeline of the events
+  -s, --stats           print XCUITest stats
+  -h, --help            display help
+`;
+
+class UsageError extends Error {}
+
+/** Returns null if help was requested. */
+function parseCliArgs(): CliOptions | null {
+  let values;
+  try {
+    ({values} = parseArgs({
+      options: {
+        input: {type: 'string', short: 'i'},
+        lines: {type: 'string', short: 'l', default: '50'},
+        timeline: {type: 'boolean', short: 't'},
+        stats: {type: 'boolean', short: 's'},
+        help: {type: 'boolean', short: 'h'},
+      },
+    }));
+  } catch (err) {
+    throw new UsageError((err as Error).message);
+  }
+  if (values.help) {
+    process.stdout.write(USAGE);
+    return null;
+  }
+  if (!values.input) {
+    throw new UsageError("required option '-i, --input <path>' not specified");
+  }
+  if (!/^\d+$/.test(values.lines) || !Number(values.lines)) {
+    throw new UsageError(`option '-l, --lines <number>' must be a positive integer, got '${values.lines}'`);
+  }
+  return {...values, input: values.input, lines: Number(values.lines)};
+}
 
 try {
-  await program.parseAsync();
+  const options = parseCliArgs();
+  if (options) {
+    await run(options);
+  }
 } catch (err) {
   process.stderr.write(`${(err as Error).message}\n`);
+  if (err instanceof UsageError) {
+    process.stderr.write(`\n${USAGE}`);
+  }
   process.exitCode = 1;
 }

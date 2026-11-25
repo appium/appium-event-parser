@@ -22,9 +22,33 @@ describe('cli', function () {
     await assert.rejects(run(process.execPath, [CLI, '-i', FIXTURE]), /Use -t to print a timeline/);
   });
 
-  it('should ignore unknown flags', async function () {
-    const {stdout} = await run(process.execPath, [CLI, '-t', '-i', FIXTURE, '--foo']);
-    assert.match(stdout, /xcodeDetailsRetrieved@0s/);
+  it('should fail for unknown flags and print usage', async function () {
+    await assert.rejects(run(process.execPath, [CLI, '-t', '-i', FIXTURE, '--foo']), (err: any) => {
+      assert.equal(err.code, 1);
+      assert.match(err.stderr, /Unknown option '--foo'/);
+      assert.match(err.stderr, /Usage: appium-event-parser/);
+      return true;
+    });
+  });
+
+  it('should fail for invalid --lines values', async function () {
+    for (const lines of ['abc', '1.5', '12abc', '0']) {
+      await assert.rejects(run(process.execPath, [CLI, '-t', '-i', FIXTURE, '-l', lines]), (err: any) => {
+        assert.equal(err.code, 1);
+        assert.match(err.stderr, /must be a positive integer/);
+        return true;
+      });
+    }
+  });
+
+  it('should honor --lines', async function () {
+    const {stdout} = await run(process.execPath, [CLI, '-t', '-i', FIXTURE, '--lines', '5']);
+    assert.ok(stdout.trim().split('\n').length <= 7);
+  });
+
+  it('should print usage for --help', async function () {
+    const {stdout} = await run(process.execPath, [CLI, '--help']);
+    assert.match(stdout, /Usage: appium-event-parser/);
   });
 
   it('should print a clean error without a stack trace', async function () {
